@@ -20,6 +20,7 @@ app.use(express.json())
 
 app.use('/push' , pushHandler)
 
+// adding commands 
 for(const folder of commandFolders){
 
     const commandPath = path.join(foldersPath, folder)
@@ -37,7 +38,7 @@ for(const folder of commandFolders){
 
     }
 }
-
+// adding events
 for(const file of eventFiles){
 
     const filePath = path.join(eventsPath , file)
