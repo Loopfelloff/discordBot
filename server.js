@@ -1,4 +1,8 @@
 require("dotenv").config()
+const express = require('express')
+const app = express()
+const cors = require('cors')
+const pushHandler = require('./router/pushRouter')
 const fs = require("fs")
 const path = require("path")
 const {Client ,GatewayIntentBits, Collection} = require('discord.js')
@@ -10,6 +14,11 @@ const eventFiles  = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js
 const commandFolders = fs.readdirSync(foldersPath) // this lists the array of string which contain the names of the sub-folder i guess dk about files
 client.commands = new Collection()
 client.cooldowns = new Collection()
+
+app.use(cors())
+app.use(express.json())
+
+app.use('/push' , pushHandler)
 
 for(const folder of commandFolders){
 
@@ -42,5 +51,8 @@ for(const file of eventFiles){
     }
 
 }
+app.listen(5000 , async ()=>{
+    await client.login(token)
+    console.log(`server is listening at port 5000`) 
+})
 
-client.login(token)
