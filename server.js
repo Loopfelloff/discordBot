@@ -1,12 +1,15 @@
 require("dotenv").config()
 const fs = require("fs")
 const path = require("path")
-const {Client , Events , GatewayIntentBits, Collection , MessageFlags} = require('discord.js')
+const {Client ,GatewayIntentBits, Collection} = require('discord.js')
 const token = process.env.DiSCORD_BOT_TOKEN
 const client = new Client({ intents: [GatewayIntentBits.Guilds]})
 const foldersPath = path.join(__dirname , 'commands')
+const eventsPath = path.join(__dirname , 'events')
+const eventFiles  = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'))
 const commandFolders = fs.readdirSync(foldersPath) // this lists the array of string which contain the names of the sub-folder i guess dk about files
 client.commands = new Collection()
+client.cooldowns = new Collection()
 
 for(const folder of commandFolders){
 
@@ -26,37 +29,18 @@ for(const folder of commandFolders){
     }
 }
 
+for(const file of eventFiles){
 
-client.once(Events.ClientReady, readyClient =>{
-    console.log(`Ready! Logged in as ${readyClient.user.tag}`)
-})
+    const filePath = path.join(eventsPath , file)
+    const eventObj = require(filePath)
 
-client.on(Events.InteractionCreate , async interaction=>{ // this is the command handler the async interaction
-
-    if(!interaction.isChatInputCommand()) return;
-
-    const command = interaction.client.commands.get(interaction.commandName)
-
-    if(!command){
-	console.error(`No command matching${interaction.commandName} found }`)
-	return;
+    if(eventObj.once){
+	client.once(eventObj.name,eventObj.execute)
+    }
+    else{
+	client.on(eventObj.name, eventObj.execute)
     }
 
-    try{
-	await command.execute(interaction)
-    }
-    catch(err){
-	console.error(err)		
-	if(interaction.replied || interaction.deferred){
-	    await interaction.followUp({content : 'There was an error while executing this command' , flags:MessageFlags.Ephemeral})
-	}	
-	else{
-	    await interaction.reply({content : 'There was an error while executing this command' , flags :MessageFlags.Ephemeral })// to make a reply private what you are supposed to do is => interaction.reply({content: 'message you want to send' , flags : MessageFlags.Ephemeral})
-	}
-    }
-
-    
-})
-
+}
 
 client.login(token)

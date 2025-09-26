@@ -1,7 +1,7 @@
 const {SlashCommandBuilder} = require('discord.js')
 const {format} = require('date-fns')
 module.exports = {
-    
+    cooldown : 5,    
     data : new SlashCommandBuilder().setName('ping').setDescription('Provides information about the user itself'),
     execute : async function(interaction){
 	const timestamp = interaction.member.guild.joinedTimestamp
