@@ -16,7 +16,11 @@ client.commands = new Collection()
 client.cooldowns = new Collection()
 
 app.use(cors())
-app.use(express.json())
+app.use(express.json({
+    verify : (req , res , buf)=>{
+	req.rawBody = buf // buf stands for buffer which stores the hexadecimal equivalent of your application/json in text format in a buffer
+    }
+}))
 
 app.use('/push' , pushHandler)
 

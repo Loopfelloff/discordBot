@@ -14,10 +14,40 @@ module.exports = {
 	    let fileNames =''
 
 	    value.added.forEach((file, count) => {
-		fileNames = fileNames + ' ' + count + ')' + ' ' + file  	
+		fileNames = `
+${fileNames} ${count+1} ) ${file} \n
+` 
 	    });
 
-	    await channel.send(`Commit_Made : ${value.committer.username} , has added ${fileNames}, removed ${value.removed.length} , modified ${value.modified.length} files`) 
+	    let modifiedFileNames = ''
+
+	    value.modified.forEach((file, count) => {
+		modifiedFileNames = `
+${modifiedFileNames} ${count+1} ) ${file} \n
+` 
+	    });
+
+	    let deletedFileNames = ''
+
+	    value.removed.forEach((file, count) => {
+		deletedFileNames = `
+${deletedFileNames} ${count+1} ) ${file} \n
+` 
+	    });
+
+	    let combinedMsg = `
+${value.committer.username} has 
+🟢 -- added : 
+${fileNames}
+🟡 -- modified: 
+${modifiedFileNames}
+🔴 -- deleted:
+${deletedFileNames}
+
+msg : ${value.message}
+`
+
+	    await channel.send(combinedMsg) 
 	})
 
 	
